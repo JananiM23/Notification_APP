@@ -2,9 +2,8 @@ const axios = require('axios');
 const { message } = require('../jobFunctions/notificatiion');
 const textLocalURl = 'https://api.textlocal.in/send';
 const APIKey = `MzM3ODU3NTM1OTM1NTk2ZTcwNmE3MTUyNzE2Mjc2Nzc=`;
-const user = require('../model/user.model');
 const order = require('../model/order.model');
-const mongoose = require('mongoose');
+const email = require('nodemailer');
 
 const SMS = async (req, res) => {
     try {
@@ -36,11 +35,11 @@ const orderData = async (req, res) => {
                 from: 'users', 
                 localField: 'userId', 
                 foreignField: '_id', 
-                as: 'result'
+                as: 'userdata'
               }
             }, {
               $unwind: {
-                path: '$result', 
+                path: '$userdata', 
                 preserveNullAndEmptyArrays: true
               }
             }, {
@@ -48,23 +47,49 @@ const orderData = async (req, res) => {
                 productName: 1, 
                 productPrize: 1, 
                 orderDate: 1, 
-                orderAddress: 1, 
-                phoneNumber: 1, 
-                userId: 1, 
-                "result.username": 1, 
-                "result.name": 1, 
-                "result.phoneNumber": 1
+                'userdata.name': 1, 
+                'userdata.email': 1
               }
             }
           ]
     
         let result = await order.aggregate(aggregationPipeline).exec();
+
+        let emails = [];
+
+        result.map(item => {
+            emails.push(item.userdata.email)
+        })
+
+        console.log(emails);
+        let notification = email.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'prakashohm96@gmail.com',
+                pass: 'vemsfabwfofkqend'
+            }
+        });
+
+        let mail = {
+            from:'prakashohm96@gmail.com',
+            to:emails,
+            subject:'Sample email',
+            text:`<h1>Hello user: ${emails[0]}</h1>`
+        }
         
+        notification.sendMail(mail, (err, data) => {
+            if(err){
+                console.log(err)
+            }else{
+                console.log(`Email send : ${data.response}`)
+            }
+        })
+
         if(!result && result == undefined){
             return res.status(404).send(`No orders for today`)
         } else {
             console.log(`notifications sent`);
-            return res.status(200).send(`notifications sent`)
+            return res.status(200).send({results: result})
         } 
     } catch (error) {
         res.status(500).send(`ERROR:`, error.message);

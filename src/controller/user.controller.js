@@ -3,13 +3,14 @@ const user = require('../model/user.model');
 
 const create = async (req, res) => {
     try {
-        let {username, password, name, age, phoneNumber } = req.body;
+        let {username, password, name, age, phoneNumber, email } = req.body;
         let data = {
             username: username,
             password: password,
             name: name,
             age: age,
-            phoneNumber: phoneNumber
+            phoneNumber: phoneNumber,
+            email: email
         }
         let response = await user.create(data);
 
