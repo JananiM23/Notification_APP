@@ -58,10 +58,9 @@ const orderData = async (req, res) => {
         let emails = [];
 
         result.map(item => {
-            emails.push(item.userdata.email)
+            names.push(item.userdata.name);
         })
 
-        console.log(emails);
         let notification = email.createTransport({
             service: 'gmail',
             auth: {
@@ -70,20 +69,24 @@ const orderData = async (req, res) => {
             }
         });
 
-        let mail = {
-            from:'prakashohm96@gmail.com',
-            to:emails,
-            subject:'Sample email',
-            text:`<h1>Hello user: ${emails[0]}</h1>`
-        }
-        
-        notification.sendMail(mail, (err, data) => {
-            if(err){
-                console.log(err)
-            }else{
-                console.log(`Email send : ${data.response}`)
+        for(let i = 0; i < emails.length; i++){
+            let mail = {
+                from:'prakashohm96@gmail.com',
+                to:emails[i],
+                subject:'Sample email',
+                text:`<h1>Hello user Welcome: ${emails[i]}</h1>`
             }
-        })
+            
+            notification.sendMail(mail, (err, data) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    console.log(`Email send : ${data.response}`)
+                }
+            })
+        }
+
+        
 
         if(!result && result == undefined){
             return res.status(404).send(`No orders for today`)
