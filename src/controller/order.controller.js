@@ -3,13 +3,14 @@ const order = require('../model/order.model');
 
 const createOrder = async (req, res) => {
     try {
-        let {productName, productPrize, orderDate, orderAddress, orderMobileNumber} = req.body;
+        let {productName, productPrize, orderDate, orderAddress, phoneNumber, userId} = req.body;
         let data = {
             productName: productName,
             productPrize: productPrize,
             orderDate: orderDate,
             orderAddress: orderAddress,
-            orderMobileNumber: orderMobileNumber
+            phoneNumber: phoneNumber,
+            userId: userId
         }
         let response = await order.create(data);
 

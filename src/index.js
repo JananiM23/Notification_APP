@@ -1,5 +1,5 @@
 const express = require('express');
-// const job = require('../cronJob');
+const job = require('../cronJob');
 const text = require('./router/textLocal.route');
 const user = require('./router/user.route');
 const order = require('./router/order.route');
@@ -10,7 +10,7 @@ const port = 3000;
 
 app.use(express.json());
 
-// job.runJob();
+job.runJob();
 
 connection.once("open", () => {
     try {

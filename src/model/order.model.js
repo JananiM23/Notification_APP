@@ -14,8 +14,12 @@ const orderSchema = new mongoose.Schema(
         orderAddress:{
             type: String
         },
-        orderMobileNumber:{
+        phoneNumber:{
             type: String
+        },
+        userId:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'user'
         }
     }
 );
