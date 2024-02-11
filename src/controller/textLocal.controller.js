@@ -55,12 +55,16 @@ const orderData = async (req, res) => {
     
         let result = await order.aggregate(aggregationPipeline).exec();
 
-        let emails = [];
+        let emails = result.map(item => {
+            return {
+                name: item.userdata.name,
+                email: item.userdata.email,
+                orderDate: item.orderDate,
+                product_name: item.productName
+            }
+        });
 
-        result.map(item => {
-            names.push(item.userdata.name);
-        })
-
+        console.log(emails);
         let notification = email.createTransport({
             service: 'gmail',
             auth: {
@@ -72,9 +76,9 @@ const orderData = async (req, res) => {
         for(let i = 0; i < emails.length; i++){
             let mail = {
                 from:'prakashohm96@gmail.com',
-                to:emails[i],
+                to:emails[i].email,
                 subject:'Sample email',
-                text:`<h1>Hello user Welcome: ${emails[i]}</h1>`
+                text:`Hello user Welcome:${emails[i].name}, you order ${emails[i].product_name} is to be delivered on ${emails[i].orderDate}`
             }
             
             notification.sendMail(mail, (err, data) => {
@@ -95,7 +99,7 @@ const orderData = async (req, res) => {
             return res.status(200).send({results: result})
         } 
     } catch (error) {
-        res.status(500).send(`ERROR:`, error.message);
+        res.status(500).send('ERROR: ' + error.message);
     }
     
 }
