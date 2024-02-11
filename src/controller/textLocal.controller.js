@@ -29,6 +29,7 @@ const SMS = async (req, res) => {
 
 const orderData = async (req, res) => {
     try {
+        let date = new Date()
         let aggregationPipeline = [
             {
               $lookup: {
@@ -42,7 +43,13 @@ const orderData = async (req, res) => {
                 path: '$userdata', 
                 preserveNullAndEmptyArrays: true
               }
-            }, {
+            },
+            {
+                $match:{
+                    'orderDate': date
+                }
+            },
+             {
               $project: {
                 productName: 1, 
                 productPrize: 1, 
