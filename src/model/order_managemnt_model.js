@@ -26,4 +26,6 @@ const order_management_Schema = new mongoose.Schema({
       })
 
 const order_management = mongoose.model("order_management", order_management_Schema);
-module.exports = order_management;
+module.exports = {
+    orderManagement:order_management
+}

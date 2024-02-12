@@ -3,7 +3,7 @@ const { message } = require('../jobFunctions/notificatiion');
 const textLocalURl = 'https://api.textlocal.in/send';
 const APIKey = `MzM3ODU3NTM1OTM1NTk2ZTcwNmE3MTUyNzE2Mjc2Nzc=`;
 const order = require('../model/order.model');
-const order_management = require(`../model/order_managemnt_model`);
+const orderSchema = require(`../model/order_managemnt_model`);
 const email = require('nodemailer');
 
 const SMS = async (req, res) => {
@@ -125,7 +125,7 @@ const createOrderManagement = async (req,res) => {
         Active_Status: Active_Status
     }
     try {
-        let response = await order_management.create(data);
+        let response = await orderSchema.order_management_Schema.create(data);
         res.status(200).send(response)
     } catch (error) {
         res.status(500).send(`Somthing went wrong`)
@@ -160,7 +160,8 @@ const getOrderManagement = async (req, res) => {
       ]
 
       try {
-        let response = await order_management.aggregate(aggregate_data);
+        let response = await orderSchema.orderManagement.aggregate(aggregate_data);
+        console.log(response)
         res.status(200).send(response)
       } catch (error) {
         res.status(500).send(`Somthing went wrong`)
