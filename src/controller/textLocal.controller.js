@@ -3,6 +3,7 @@ const { message } = require('../jobFunctions/notificatiion');
 const textLocalURl = 'https://api.textlocal.in/send';
 const APIKey = `MzM3ODU3NTM1OTM1NTk2ZTcwNmE3MTUyNzE2Mjc2Nzc=`;
 const order = require('../model/order.model');
+const order_management = require(`../model/order_managemnt_model`);
 const email = require('nodemailer');
 
 const SMS = async (req, res) => {
@@ -44,11 +45,11 @@ const orderData = async (req, res) => {
                 preserveNullAndEmptyArrays: true
               }
             },
-            {
-                $match:{
-                    'orderDate': date
-                }
-            },
+            // {
+            //     $match:{
+            //         'orderDate': date
+            //     }
+            // },
              {
               $project: {
                 productName: 1, 
@@ -111,7 +112,64 @@ const orderData = async (req, res) => {
     
 }
 
+const createOrderManagement = async (req,res) => {
+    const { customer_id, Payable_Amount, Payment_Status, Payment_Type, OrderConfirmed, Active_Status} = req.body
+    let date = new Date();
+    let data = {
+        customer_id: customer_id,
+        Payable_Amount: Payable_Amount,
+        Payment_Status: Payment_Status,
+        Payment_Type: Payment_Type,
+        DeliveryDate: date,
+        OrderConfirmed: OrderConfirmed,
+        Active_Status: Active_Status
+    }
+    try {
+        let response = await order_management.create(data);
+        res.status(200).send(response)
+    } catch (error) {
+        res.status(500).send(`Somthing went wrong`)
+    }
+}
+
+const getOrderManagement = async (req, res) => {
+    let aggregate_data = [
+        {
+          '$lookup': {
+            from: 'users', 
+            localField: 'customer_id', 
+            foreignField: '_id', 
+            as: 'result'
+          }
+        }, {
+          '$unwind': {
+            path: '$result', 
+            preserveNullAndEmptyArrays: true
+          }
+        }, {
+          '$project': {
+            Payable_Amount: 1, 
+            Payment_Status: 1, 
+            Payment_Type: 1, 
+            DeliveryDate: 1, 
+            'result.username': 1, 
+            'result.name': 1, 
+            'result.phoneNumber': 1
+          }
+        }
+      ]
+
+      try {
+        let response = await order_management.aggregate(aggregate_data);
+        res.status(200).send(response)
+      } catch (error) {
+        res.status(500).send(`Somthing went wrong`)
+      }
+}
+
 module.exports = {
     SMS,
-    orderData
+    orderData,
+    createOrderManagement,
+    getOrderManagement
 }
